@@ -170,7 +170,7 @@ def build_alltime(seasons_data):
                                       "best_finish": 99, "finishes": [], "team_names": set()})
             career[champ]["titles"] += 1
 
-    # fold in remembered pre-archive finishes (2016–17)
+    # fold in remembered pre-archive finishes (2016–17): titles / best / avg only
     for places in MANUAL_FINISHES.values():
         for place, m in places.items():
             c = career.get(m)
@@ -178,11 +178,22 @@ def build_alltime(seasons_data):
                 c = career[m] = {"manager": m, "seasons": 0, "titles": 0, "w": 0,
                                  "l": 0, "t": 0, "pf": 0.0, "pa": 0.0,
                                  "best_finish": 99, "finishes": [], "team_names": set()}
-            c["seasons"] += 1
             c["best_finish"] = min(c["best_finish"], place)
             c["finishes"].append(place)
             if place == 1:
                 c["titles"] += 1
+
+    # Count 2016 & 2017 toward a manager's season total if they were in the
+    # league then. We know they were if they either have a remembered finish
+    # that year, OR played every archived season — i.e. the same number of
+    # games as Haoran, the full-tenure baseline (2016 & 2017 have no game data).
+    hg = career.get("Haoran")
+    baseline_games = (hg["w"] + hg["l"] + hg["t"]) if hg else None
+    full_tenure = {m for m, c in career.items()
+                   if baseline_games and (c["w"] + c["l"] + c["t"]) == baseline_games}
+    for places in MANUAL_FINISHES.values():
+        for m in set(places.values()) | full_tenure:
+            career[m]["seasons"] += 1
 
     out = []
     for c in career.values():
