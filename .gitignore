@@ -1,0 +1,20 @@
+# --- secrets — NEVER commit (holds NFL.com session cookies) ---
+auth.json
+
+# --- large local capture archive (4+ GB); regenerate with crawl.py ---
+raw/
+net/
+shots/
+manifest.csv
+
+# --- python ---
+.venv/
+__pycache__/
+*.pyc
+
+# --- node / build output ---
+node_modules/
+dist/
+
+# --- os ---
+.DS_Store
